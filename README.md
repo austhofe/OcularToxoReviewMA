@@ -1,33 +1,13 @@
-DOI here when published
-
-# About The Project
-
-This is the research compendium for "Ocular Toxoplasmosis Infection Leading to Uveitis and or Lesions - A Systematic Review and Meta-Analysis" currently under submission. In this article we found 63 articles which describe uveitis and lesions following toxoplasmosis. 
-
-PROSPERO Registration #: CRD42021289925
-
-## Citation
-Boyd K, Condrey K, Rosa Hernandez A, Austhof E, Lin L, Dehnbostel1 J, Hoffmann S, Flaxel C, Pogreba-Brown K. Ocular Toxoplasmosis Infection Leading to Uveitis and or Lesions - A Systematic Review and Meta-Analysis
-Full Article link here when published
-
-## Contents
-
-This research compendium includes:
-* Data extracted from included research articles
-* Excel sheet with tables and summary measures
-* Files from literature searches for each database
-* Supplemental material file with additional tables and information
-
-## Codes
+# Codes
 The codes branch contains the codes for a Bayesian hierarchical model with a zero-inflated mixture prior, used in this project.
 
-### Files
+## Files
 
-#### 1. `ma.prop.mix.R`
+### 1. `ma.prop.mix.R`
 
 This script defines the primary modeling function: `ma.prop.mix()`, which performs a Bayesian meta-analysis of proportions using a **zero-inflated binomial mixture model** implemented in **JAGS**. The function is designed to handle datasets with potential structural zeros.
 
-##### Function: `ma.prop.mix(e, n, data, mass0 = TRUE, ...)`
+#### Function: `ma.prop.mix(e, n, data, mass0 = TRUE, ...)`
 
 **Arguments**:
 - `e`: Vector of event counts (number of cases).
@@ -50,7 +30,7 @@ This script defines the primary modeling function: `ma.prop.mix()`, which perfor
 
 ---
 
-#### 2. `processing_code.Rmd`
+### 2. `processing_code.Rmd`
 
 This R Markdown document provides the full analysis pipeline for prevalent cases using the above model.
 
@@ -62,7 +42,7 @@ This R Markdown document provides the full analysis pipeline for prevalent cases
 - **Visualization** *(if applicable)*: Can include posterior distributions, predictive intervals, and summary tables.
 
 
-### How to Run
+## How to Run
 
 1. Open R or RStudio and install any required packages:
    - `rjags`, `readxl`, `rmarkdown`, `ggplot2`, etc.
@@ -71,15 +51,6 @@ This R Markdown document provides the full analysis pipeline for prevalent cases
 
 ```r
 source("ma.prop.mix_updated seed.R")
+```
 
-## License
-
-Distributed under the MIT License. See `LICENSE.txt` for more information.
-Researchers interested in using this data for subsequent publications or research projects should contact the corresponding author, Kristen Pogreba-Brown, kpogreba@arizona.edu.
-
-
-## Contact
-
-Erika Austhof - barrette@arizona.edu
-
-Project Link: ([OcularToxoReviewMA](https://github.com/austhofe/OcularToxoReviewMA/))
+3. Change the pathway for import of the dataset if needed.
