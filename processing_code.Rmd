@@ -1,0 +1,395 @@
+---
+title: "prevalent_cases"
+author: "Zelin Wang"
+date: "2025-01-26"
+output: html_document
+---
+
+# Prevalent cases
+
+## attach libraries
+```{r}
+library("readxl")
+library("meta")
+library("rjags")
+```
+
+## set up the source function pathway for (ma.prop.mix.R)
+```{r}
+source("ma.prop.mix_updated seed.R")
+```
+
+## import data
+```{r}
+#change the pathway for data import if needed
+dat <- read_xlsx("meta_analysis_data_5-20-2024_original.xlsx", sheet = "Sheet1", range = "A1:AH64")
+dat <- as.data.frame(dat)
+```
+
+## data manipulation
+```{r}
+sid <- paste0(dat$author, " (", dat$pub_year, ")")
+dat <- cbind(dat, sid = sid)
+
+regions <- sort(unique(dat$region))
+casepops <- sort(unique(dat$casepop_final))
+designs <- sort(unique(dat$study_design_qc))
+dxmethods <- sort(unique(dat$dxmethod))
+```
+
+#### uveitis_prop_final
+```{r}
+dat.uveitis <- dat[!is.na(dat$uveitis_pt_count_final) & !is.na(dat$total_n_final), ]
+rslt.uveitis <- metaprop(event = uveitis_pt_count_final, n = total_n_final, studlab = sid, data = dat.uveitis)
+
+pdf("forest uveitis_prop_final.pdf", width = 15, height = 15)
+forest(rslt.uveitis, pscale = 100, leftcols = c("studlab", "event", "n",
+  "region", "casepop_final", "study_design_qc", "dxmethod"),
+  leftlabs = c("Study", "Events", "Total", "Region", "Case population source",
+  "Study design", "Diagnosis method"),
+  overall = FALSE, print.I2 = FALSE, print.tau2 = FALSE, print.pval.Q = FALSE)
+dev.off()
+
+
+## overall
+
+rslt <- ma.prop.mix(uveitis_pt_count_final, total_n_final, dat, mass0 = FALSE)
+
+format(round(rslt$smry$p.mass.mean*100, 2), nsmall = 2)
+format(round(rslt$smry$prop.median*100, 2), nsmall = 2)
+CrI <- format(round(rslt$smry$prop.CrI*100, 2), nsmall = 2)
+paste0("(", CrI[1], ", ", CrI[2], ")")
+PI.nonmass <- format(round(rslt$smry$PI.nonmass*100, 2), nsmall = 2)
+paste0("(", PI.nonmass[1], ", ", PI.nonmass[2], ")")
+PI.overall <- format(round(rslt$smry$PI.overall*100, 2), nsmall = 2)
+paste0("(", PI.overall[1], ", ", PI.overall[2], ")")
+
+for(i in 1:length(regions)){
+  dat.temp <- dat[dat$region == regions[i],]
+  print(regions[i])
+  rslt.temp <- ma.prop.mix(uveitis_pt_count_final, total_n_final, dat.temp, mass0 = FALSE)
+  print(format(round(rslt.temp$smry$p.mass.mean*100, 2), nsmall = 2))
+  print(format(round(rslt.temp$smry$prop.median*100, 2), nsmall = 2))
+  CrI.temp <- format(round(rslt.temp$smry$prop.CrI*100, 2), nsmall = 2)
+  print(paste0("(", CrI.temp[1], ", ", CrI.temp[2], ")"))
+  PI.nonmass.temp <- format(round(rslt.temp$smry$PI.nonmass*100, 2), nsmall = 2)
+  print(paste0("(", PI.nonmass.temp[1], ", ", PI.nonmass.temp[2], ")"))
+  PI.overall.temp <- format(round(rslt.temp$smry$PI.overall*100, 2), nsmall = 2)
+  print(paste0("(", PI.overall.temp[1], ", ", PI.overall.temp[2], ")"))
+  cat("\n")
+}
+
+
+for(i in 1:length(casepops)){
+  dat.temp <- dat[dat$casepop_final == casepops[i],]
+  print(casepops[i])
+  rslt.temp <- ma.prop.mix(uveitis_pt_count_final, total_n_final, dat.temp, mass0 = FALSE)
+  print(format(round(rslt.temp$smry$p.mass.mean*100, 2), nsmall = 2))
+  print(format(round(rslt.temp$smry$prop.median*100, 2), nsmall = 2))
+  CrI.temp <- format(round(rslt.temp$smry$prop.CrI*100, 2), nsmall = 2)
+  print(paste0("(", CrI.temp[1], ", ", CrI.temp[2], ")"))
+  PI.nonmass.temp <- format(round(rslt.temp$smry$PI.nonmass*100, 2), nsmall = 2)
+  print(paste0("(", PI.nonmass.temp[1], ", ", PI.nonmass.temp[2], ")"))
+  PI.overall.temp <- format(round(rslt.temp$smry$PI.overall*100, 2), nsmall = 2)
+  print(paste0("(", PI.overall.temp[1], ", ", PI.overall.temp[2], ")"))
+  cat("\n")
+}
+
+for(i in 1:length(designs)){
+  dat.temp <- dat[dat$study_design_qc == designs[i],]
+  print(designs[i])
+  rslt.temp <- ma.prop.mix(uveitis_pt_count_final, total_n_final, dat.temp, mass0 = FALSE)
+  print(format(round(rslt.temp$smry$p.mass.mean*100, 2), nsmall = 2))
+  print(format(round(rslt.temp$smry$prop.median*100, 2), nsmall = 2))
+  CrI.temp <- format(round(rslt.temp$smry$prop.CrI*100, 2), nsmall = 2)
+  print(paste0("(", CrI.temp[1], ", ", CrI.temp[2], ")"))
+  PI.nonmass.temp <- format(round(rslt.temp$smry$PI.nonmass*100, 2), nsmall = 2)
+  print(paste0("(", PI.nonmass.temp[1], ", ", PI.nonmass.temp[2], ")"))
+  PI.overall.temp <- format(round(rslt.temp$smry$PI.overall*100, 2), nsmall = 2)
+  print(paste0("(", PI.overall.temp[1], ", ", PI.overall.temp[2], ")"))
+  cat("\n")
+}
+
+for(i in 1:length(dxmethods)){
+  dat.temp <- dat[dat$dxmethod == dxmethods[i],]
+  print(dxmethods[i])
+  rslt.temp <- ma.prop.mix(uveitis_pt_count_final, total_n_final, dat.temp, mass0 = FALSE)
+  print(format(round(rslt.temp$smry$p.mass.mean*100, 2), nsmall = 2))
+  print(format(round(rslt.temp$smry$prop.median*100, 2), nsmall = 2))
+  CrI.temp <- format(round(rslt.temp$smry$prop.CrI*100, 2), nsmall = 2)
+  print(paste0("(", CrI.temp[1], ", ", CrI.temp[2], ")"))
+  PI.nonmass.temp <- format(round(rslt.temp$smry$PI.nonmass*100, 2), nsmall = 2)
+  print(paste0("(", PI.nonmass.temp[1], ", ", PI.nonmass.temp[2], ")"))
+  PI.overall.temp <- format(round(rslt.temp$smry$PI.overall*100, 2), nsmall = 2)
+  print(paste0("(", PI.overall.temp[1], ", ", PI.overall.temp[2], ")"))
+  cat("\n")
+}
+```
+
+#### uveitis_prop_congenital_final
+```{r}
+dat.uveitis.congenital <- dat[!is.na(dat$uv_cong_num) & !is.na(dat$uv_cong_denom), ]
+rslt.uveitis.congenital <- metaprop(event = uv_cong_num, n = uv_cong_denom, studlab = sid, data = dat.uveitis.congenital)
+
+pdf("forest uveitis_prop_congenital_final.pdf", width = 15, height = 15)
+forest(rslt.uveitis.congenital , pscale = 100, leftcols = c("studlab", "event", "n",
+  "region", "casepop_final", "study_design_qc", "dxmethod"),
+  leftlabs = c("Study", "Events", "Total", "Region", "Case population source",
+  "Study design", "Diagnosis method"),
+  overall = FALSE, print.I2 = FALSE, print.tau2 = FALSE, print.pval.Q = FALSE)
+dev.off()
+
+
+## overall
+
+rslt <- ma.prop.mix(uv_cong_num, uv_cong_denom, dat, mass0 = FALSE)
+
+format(round(rslt$smry$p.mass.mean*100, 2), nsmall = 2)
+format(round(rslt$smry$prop.median*100, 2), nsmall = 2)
+CrI <- format(round(rslt$smry$prop.CrI*100, 2), nsmall = 2)
+paste0("(", CrI[1], ", ", CrI[2], ")")
+PI.nonmass <- format(round(rslt$smry$PI.nonmass*100, 2), nsmall = 2)
+paste0("(", PI.nonmass[1], ", ", PI.nonmass[2], ")")
+PI.overall <- format(round(rslt$smry$PI.overall*100, 2), nsmall = 2)
+paste0("(", PI.overall[1], ", ", PI.overall[2], ")")
+
+for(i in 1:length(regions)){
+  dat.temp <- dat[dat$region == regions[i],]
+  print(regions[i])
+  rslt.temp <- ma.prop.mix(uv_cong_num, uv_cong_denom, dat.temp, mass0 = FALSE)
+  print(format(round(rslt.temp$smry$p.mass.mean*100, 2), nsmall = 2))
+  print(format(round(rslt.temp$smry$prop.median*100, 2), nsmall = 2))
+  CrI.temp <- format(round(rslt.temp$smry$prop.CrI*100, 2), nsmall = 2)
+  print(paste0("(", CrI.temp[1], ", ", CrI.temp[2], ")"))
+  PI.nonmass.temp <- format(round(rslt.temp$smry$PI.nonmass*100, 2), nsmall = 2)
+  print(paste0("(", PI.nonmass.temp[1], ", ", PI.nonmass.temp[2], ")"))
+  PI.overall.temp <- format(round(rslt.temp$smry$PI.overall*100, 2), nsmall = 2)
+  print(paste0("(", PI.overall.temp[1], ", ", PI.overall.temp[2], ")"))
+  cat("\n")
+}
+
+for(i in 1:length(casepops)){
+  dat.temp <- dat[dat$casepop_final == casepops[i],]
+  print(casepops[i])
+  rslt.temp <- ma.prop.mix(uv_cong_num, uv_cong_denom, dat.temp, mass0 = FALSE)
+  print(format(round(rslt.temp$smry$p.mass.mean*100, 2), nsmall = 2))
+  print(format(round(rslt.temp$smry$prop.median*100, 2), nsmall = 2))
+  CrI.temp <- format(round(rslt.temp$smry$prop.CrI*100, 2), nsmall = 2)
+  print(paste0("(", CrI.temp[1], ", ", CrI.temp[2], ")"))
+  PI.nonmass.temp <- format(round(rslt.temp$smry$PI.nonmass*100, 2), nsmall = 2)
+  print(paste0("(", PI.nonmass.temp[1], ", ", PI.nonmass.temp[2], ")"))
+  PI.overall.temp <- format(round(rslt.temp$smry$PI.overall*100, 2), nsmall = 2)
+  print(paste0("(", PI.overall.temp[1], ", ", PI.overall.temp[2], ")"))
+  cat("\n")
+}
+
+for(i in 1:length(designs)){
+  dat.temp <- dat[dat$study_design_qc == designs[i],]
+  print(designs[i])
+  rslt.temp <- ma.prop.mix(uv_cong_num, uv_cong_denom, dat.temp, mass0 = FALSE)
+  print(format(round(rslt.temp$smry$p.mass.mean*100, 2), nsmall = 2))
+  print(format(round(rslt.temp$smry$prop.median*100, 2), nsmall = 2))
+  CrI.temp <- format(round(rslt.temp$smry$prop.CrI*100, 2), nsmall = 2)
+  print(paste0("(", CrI.temp[1], ", ", CrI.temp[2], ")"))
+  PI.nonmass.temp <- format(round(rslt.temp$smry$PI.nonmass*100, 2), nsmall = 2)
+  print(paste0("(", PI.nonmass.temp[1], ", ", PI.nonmass.temp[2], ")"))
+  PI.overall.temp <- format(round(rslt.temp$smry$PI.overall*100, 2), nsmall = 2)
+  print(paste0("(", PI.overall.temp[1], ", ", PI.overall.temp[2], ")"))
+  cat("\n")
+}
+
+for(i in 1:length(dxmethods)){
+  dat.temp <- dat[dat$dxmethod == dxmethods[i],]
+  print(dxmethods[i])
+  rslt.temp <- ma.prop.mix(uv_cong_num, uv_cong_denom, dat.temp, mass0 = FALSE)
+  print(format(round(rslt.temp$smry$p.mass.mean*100, 2), nsmall = 2))
+  print(format(round(rslt.temp$smry$prop.median*100, 2), nsmall = 2))
+  CrI.temp <- format(round(rslt.temp$smry$prop.CrI*100, 2), nsmall = 2)
+  print(paste0("(", CrI.temp[1], ", ", CrI.temp[2], ")"))
+  PI.nonmass.temp <- format(round(rslt.temp$smry$PI.nonmass*100, 2), nsmall = 2)
+  print(paste0("(", PI.nonmass.temp[1], ", ", PI.nonmass.temp[2], ")"))
+  PI.overall.temp <- format(round(rslt.temp$smry$PI.overall*100, 2), nsmall = 2)
+  print(paste0("(", PI.overall.temp[1], ", ", PI.overall.temp[2], ")"))
+  cat("\n")
+}
+```
+
+#### lesion_prop_final
+```{r}
+#chose the data that need to be done
+dat.lesion <- dat[!is.na(dat$lesion_pt_count_final) & !is.na(dat$total_n_final), ]
+
+#create forest plot
+rslt.lesion <- metaprop(event = lesion_pt_count_final, n = total_n_final, studlab = sid, data = dat.lesion)
+
+pdf("forest lesion_prop_final.pdf", width = 15, height = 15)
+forest(rslt.lesion, pscale = 100, leftcols = c("studlab", "event", "n",
+  "region", "casepop_final", "study_design_qc", "dxmethod"),
+  leftlabs = c("Study", "Events", "Total", "Region", "Case population source",
+  "Study design", "Diagnosis method"),
+  overall = FALSE, print.I2 = FALSE, print.tau2 = FALSE, print.pval.Q = FALSE)
+dev.off()
+
+#bayesian model analysis
+## overall
+
+rslt <- ma.prop.mix(lesion_pt_count_final, total_n_final, dat, mass0 = FALSE)
+
+format(round(rslt$smry$p.mass.mean*100, 2), nsmall = 2)
+format(round(rslt$smry$prop.median*100, 2), nsmall = 2)
+CrI <- format(round(rslt$smry$prop.CrI*100, 2), nsmall = 2)
+paste0("(", CrI[1], ", ", CrI[2], ")")
+PI.nonmass <- format(round(rslt$smry$PI.nonmass*100, 2), nsmall = 2)
+paste0("(", PI.nonmass[1], ", ", PI.nonmass[2], ")")
+PI.overall <- format(round(rslt$smry$PI.overall*100, 2), nsmall = 2)
+paste0("(", PI.overall[1], ", ", PI.overall[2], ")")
+
+for(i in 1:length(regions)){
+  dat.temp <- dat[dat$region == regions[i],]
+  print(regions[i])
+  rslt.temp <- ma.prop.mix(lesion_pt_count_final, total_n_final, dat.temp, mass0 = FALSE)
+  print(format(round(rslt.temp$smry$p.mass.mean*100, 2), nsmall = 2))
+  print(format(round(rslt.temp$smry$prop.median*100, 2), nsmall = 2))
+  CrI.temp <- format(round(rslt.temp$smry$prop.CrI*100, 2), nsmall = 2)
+  print(paste0("(", CrI.temp[1], ", ", CrI.temp[2], ")"))
+  PI.nonmass.temp <- format(round(rslt.temp$smry$PI.nonmass*100, 2), nsmall = 2)
+  print(paste0("(", PI.nonmass.temp[1], ", ", PI.nonmass.temp[2], ")"))
+  PI.overall.temp <- format(round(rslt.temp$smry$PI.overall*100, 2), nsmall = 2)
+  print(paste0("(", PI.overall.temp[1], ", ", PI.overall.temp[2], ")"))
+  cat("\n")
+}
+
+for(i in 1:length(casepops)){
+  dat.temp <- dat[dat$casepop_final == casepops[i],]
+  print(casepops[i])
+  rslt.temp <- ma.prop.mix(lesion_pt_count_final, total_n_final, dat.temp, mass0 = FALSE)
+  print(format(round(rslt.temp$smry$p.mass.mean*100, 2), nsmall = 2))
+  print(format(round(rslt.temp$smry$prop.median*100, 2), nsmall = 2))
+  CrI.temp <- format(round(rslt.temp$smry$prop.CrI*100, 2), nsmall = 2)
+  print(paste0("(", CrI.temp[1], ", ", CrI.temp[2], ")"))
+  PI.nonmass.temp <- format(round(rslt.temp$smry$PI.nonmass*100, 2), nsmall = 2)
+  print(paste0("(", PI.nonmass.temp[1], ", ", PI.nonmass.temp[2], ")"))
+  PI.overall.temp <- format(round(rslt.temp$smry$PI.overall*100, 2), nsmall = 2)
+  print(paste0("(", PI.overall.temp[1], ", ", PI.overall.temp[2], ")"))
+  cat("\n")
+}
+
+for(i in 1:length(designs)){
+  dat.temp <- dat[dat$study_design_qc == designs[i],]
+  print(designs[i])
+  rslt.temp <- ma.prop.mix(lesion_pt_count_final, total_n_final, dat.temp, mass0 = FALSE)
+  print(format(round(rslt.temp$smry$p.mass.mean*100, 2), nsmall = 2))
+  print(format(round(rslt.temp$smry$prop.median*100, 2), nsmall = 2))
+  CrI.temp <- format(round(rslt.temp$smry$prop.CrI*100, 2), nsmall = 2)
+  print(paste0("(", CrI.temp[1], ", ", CrI.temp[2], ")"))
+  PI.nonmass.temp <- format(round(rslt.temp$smry$PI.nonmass*100, 2), nsmall = 2)
+  print(paste0("(", PI.nonmass.temp[1], ", ", PI.nonmass.temp[2], ")"))
+  PI.overall.temp <- format(round(rslt.temp$smry$PI.overall*100, 2), nsmall = 2)
+  print(paste0("(", PI.overall.temp[1], ", ", PI.overall.temp[2], ")"))
+  cat("\n")
+}
+
+for(i in 1:length(dxmethods)){
+  dat.temp <- dat[dat$dxmethod == dxmethods[i],]
+  print(dxmethods[i])
+  rslt.temp <- ma.prop.mix(lesion_pt_count_final, total_n_final, dat.temp, mass0 = FALSE)
+  print(format(round(rslt.temp$smry$p.mass.mean*100, 2), nsmall = 2))
+  print(format(round(rslt.temp$smry$prop.median*100, 2), nsmall = 2))
+  CrI.temp <- format(round(rslt.temp$smry$prop.CrI*100, 2), nsmall = 2)
+  print(paste0("(", CrI.temp[1], ", ", CrI.temp[2], ")"))
+  PI.nonmass.temp <- format(round(rslt.temp$smry$PI.nonmass*100, 2), nsmall = 2)
+  print(paste0("(", PI.nonmass.temp[1], ", ", PI.nonmass.temp[2], ")"))
+  PI.overall.temp <- format(round(rslt.temp$smry$PI.overall*100, 2), nsmall = 2)
+  print(paste0("(", PI.overall.temp[1], ", ", PI.overall.temp[2], ")"))
+  cat("\n")
+}
+```
+
+#### lesion_prop_congenital_final
+```{r}
+dat.lesion.congenital <- dat[!is.na(dat$les_cong_num) & !is.na(dat$les_cong_denom), ]
+rslt.lesion.congenital <- metaprop(event = les_cong_num, n = les_cong_denom, studlab = sid, data = dat.lesion.congenital)
+
+pdf("forest lesion_prop_congenital_final.pdf", width = 15, height = 15)
+forest(rslt.lesion.congenital , pscale = 100, leftcols = c("studlab", "event", "n",
+  "region", "casepop_final", "study_design_qc", "dxmethod"),
+  leftlabs = c("Study", "Events", "Total", "Region", "Case population source",
+  "Study design", "Diagnosis method"),
+  overall = FALSE, print.I2 = FALSE, print.tau2 = FALSE, print.pval.Q = FALSE)
+dev.off()
+
+
+## overall
+
+rslt <- ma.prop.mix(les_cong_num, les_cong_denom, dat, mass0 = FALSE)
+
+format(round(rslt$smry$p.mass.mean*100, 2), nsmall = 2)
+format(round(rslt$smry$prop.median*100, 2), nsmall = 2)
+CrI <- format(round(rslt$smry$prop.CrI*100, 2), nsmall = 2)
+paste0("(", CrI[1], ", ", CrI[2], ")")
+PI.nonmass <- format(round(rslt$smry$PI.nonmass*100, 2), nsmall = 2)
+paste0("(", PI.nonmass[1], ", ", PI.nonmass[2], ")")
+PI.overall <- format(round(rslt$smry$PI.overall*100, 2), nsmall = 2)
+paste0("(", PI.overall[1], ", ", PI.overall[2], ")")
+
+for(i in 1:length(regions)){
+  dat.temp <- dat[dat$region == regions[i],]
+  print(regions[i])
+  rslt.temp <- ma.prop.mix(les_cong_num, les_cong_denom, dat.temp, mass0 = FALSE)
+  print(format(round(rslt.temp$smry$p.mass.mean*100, 2), nsmall = 2))
+  print(format(round(rslt.temp$smry$prop.median*100, 2), nsmall = 2))
+  CrI.temp <- format(round(rslt.temp$smry$prop.CrI*100, 2), nsmall = 2)
+  print(paste0("(", CrI.temp[1], ", ", CrI.temp[2], ")"))
+  PI.nonmass.temp <- format(round(rslt.temp$smry$PI.nonmass*100, 2), nsmall = 2)
+  print(paste0("(", PI.nonmass.temp[1], ", ", PI.nonmass.temp[2], ")"))
+  PI.overall.temp <- format(round(rslt.temp$smry$PI.overall*100, 2), nsmall = 2)
+  print(paste0("(", PI.overall.temp[1], ", ", PI.overall.temp[2], ")"))
+  cat("\n")
+}
+
+for(i in 1:length(casepops)){
+  dat.temp <- dat[dat$casepop_final == casepops[i],]
+  print(casepops[i])
+  rslt.temp <- ma.prop.mix(les_cong_num, les_cong_denom, dat.temp, mass0 = FALSE)
+  print(format(round(rslt.temp$smry$p.mass.mean*100, 2), nsmall = 2))
+  print(format(round(rslt.temp$smry$prop.median*100, 2), nsmall = 2))
+  CrI.temp <- format(round(rslt.temp$smry$prop.CrI*100, 2), nsmall = 2)
+  print(paste0("(", CrI.temp[1], ", ", CrI.temp[2], ")"))
+  PI.nonmass.temp <- format(round(rslt.temp$smry$PI.nonmass*100, 2), nsmall = 2)
+  print(paste0("(", PI.nonmass.temp[1], ", ", PI.nonmass.temp[2], ")"))
+  PI.overall.temp <- format(round(rslt.temp$smry$PI.overall*100, 2), nsmall = 2)
+  print(paste0("(", PI.overall.temp[1], ", ", PI.overall.temp[2], ")"))
+  cat("\n")
+}
+
+for(i in 1:length(designs)){
+  dat.temp <- dat[dat$study_design_qc == designs[i],]
+  print(designs[i])
+  rslt.temp <- ma.prop.mix(les_cong_num, les_cong_denom, dat.temp, mass0 = FALSE)
+  print(format(round(rslt.temp$smry$p.mass.mean*100, 2), nsmall = 2))
+  print(format(round(rslt.temp$smry$prop.median*100, 2), nsmall = 2))
+  CrI.temp <- format(round(rslt.temp$smry$prop.CrI*100, 2), nsmall = 2)
+  print(paste0("(", CrI.temp[1], ", ", CrI.temp[2], ")"))
+  PI.nonmass.temp <- format(round(rslt.temp$smry$PI.nonmass*100, 2), nsmall = 2)
+  print(paste0("(", PI.nonmass.temp[1], ", ", PI.nonmass.temp[2], ")"))
+  PI.overall.temp <- format(round(rslt.temp$smry$PI.overall*100, 2), nsmall = 2)
+  print(paste0("(", PI.overall.temp[1], ", ", PI.overall.temp[2], ")"))
+  cat("\n")
+}
+
+for(i in 1:length(dxmethods)){
+  dat.temp <- dat[dat$dxmethod == dxmethods[i],]
+  print(dxmethods[i])
+  rslt.temp <- ma.prop.mix(les_cong_num, les_cong_denom, dat.temp, mass0 = FALSE)
+  print(format(round(rslt.temp$smry$p.mass.mean*100, 2), nsmall = 2))
+  print(format(round(rslt.temp$smry$prop.median*100, 2), nsmall = 2))
+  CrI.temp <- format(round(rslt.temp$smry$prop.CrI*100, 2), nsmall = 2)
+  print(paste0("(", CrI.temp[1], ", ", CrI.temp[2], ")"))
+  PI.nonmass.temp <- format(round(rslt.temp$smry$PI.nonmass*100, 2), nsmall = 2)
+  print(paste0("(", PI.nonmass.temp[1], ", ", PI.nonmass.temp[2], ")"))
+  PI.overall.temp <- format(round(rslt.temp$smry$PI.overall*100, 2), nsmall = 2)
+  print(paste0("(", PI.overall.temp[1], ", ", PI.overall.temp[2], ")"))
+  cat("\n")
+}
+```
+
