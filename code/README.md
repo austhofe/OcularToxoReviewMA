@@ -1,5 +1,5 @@
 # Codes
-The codes branch contains the codes for a Bayesian hierarchical model with a zero-inflated mixture prior, used in this project.
+The code folder contains the codes for a Bayesian hierarchical model with a zero-inflated mixture prior, used in this project.
 
 ## Files
 
