@@ -8,7 +8,8 @@ PROSPERO Registration #: CRD42021289925
 
 ## Citation
 Boyd K, Condrey K, Rosa Hernandez A, Austhof E, Lin L, Dehnbostel1 J, Hoffmann S, Flaxel C, Pogreba-Brown K. Ocular Toxoplasmosis Infection Leading to Uveitis and or Lesions - A Systematic Review and Meta-Analysis
-Full Article link here when published
+
+Currently under review with Foodborne Pathogens and Disease
 
 ## Contents
 
