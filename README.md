@@ -1,4 +1,4 @@
-(Link to Paper)[(https://pubmed.ncbi.nlm.nih.gov/41070450/)]
+([Link to Paper](https://pubmed.ncbi.nlm.nih.gov/41070450/))
 
 # About The Project
 
