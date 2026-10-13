@@ -1,4 +1,4 @@
-DOI here when published
+(Link to Paper)[(https://pubmed.ncbi.nlm.nih.gov/41070450/)]
 
 # About The Project
 
@@ -7,9 +7,7 @@ This is the research compendium for "Ocular Toxoplasmosis Infection Leading to U
 PROSPERO Registration #: CRD42021289925
 
 ## Citation
-Boyd K, Condrey K, Rosa Hernandez A, Austhof E, Lin L, Dehnbostel1 J, Hoffmann S, Flaxel C, Pogreba-Brown K. Ocular Toxoplasmosis Infection Leading to Uveitis and or Lesions - A Systematic Review and Meta-Analysis
-
-Currently under review with Foodborne Pathogens and Disease
+Boyd K, Condrey K, Rosa Hernandez A, Austhof E, Lin L, Dehnbostel J, Hoffmann S, Flaxel C, Wang Z, Pogreba-Brown K. Ocular Toxoplasmosis Infection Leading to Uveitis or Chorioretinal Lesions: A Systematic Review. Foodborne Pathog Dis. 2026 Nov;23(11):723-735. doi: 10.1177/15353141251382884. Epub 2025 Oct 10. PMID: 41070450.
 
 ## Contents
 
